@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="log.root.level" value="${log.root.level}" />
+	<property name="log.other.level" value="${log.other.level}" />
+	<property name="log.base" value="${log.base}" />
+	<property name="log.moduleName" value="${log.moduleName}" />
+	<property name="log.max.size" value="100MB" />
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger{56}.%method\(\):%L -%msg%n</Pattern>
+		</encoder>
+	</appender>
+	<appender name="file.all" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.base}/${log.moduleName}.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base}/archive/${log.moduleName}_all_%d{yyyy-MM-dd}.%i.log.zip
+			</FileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>${log.max.size}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger{56}.%method\(\):%L -%msg%n</pattern>
+		</layout>
+	</appender>
+	<appender name="file.all.other" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.base}/${log.moduleName}_other.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base}/archive/${log.moduleName}_other_%d{yyyy-MM-dd}.%i.log.zip
+			</FileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>${log.max.size}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{56}.%method\(\):%L -%msg%n</pattern>
+		</layout>
+	</appender>
+	<appender name="file.error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.base}/${log.moduleName}_err.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base}/archive/${log.moduleName}_err_%d{yyyy-MM-dd}.%i.log.zip
+			</FileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>${log.max.size}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{56}.%method\(\):%L - %msg%n</pattern>
+		</layout>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+	<appender name="file.async" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>256</queueSize>
+		<includeCallerData>true</includeCallerData>
+		<appender-ref ref="file.all" />
+	</appender>
+	<appender name="file.async.other" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>256</queueSize>
+		<includeCallerData>true</includeCallerData>
+		<appender-ref ref="file.all.other" />
+	</appender>
+	<root level="${log.root.level}">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="file.async.other" />
+		<appender-ref ref="file.error" />
+	</root>
+</configuration>
